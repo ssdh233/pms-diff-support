@@ -1,0 +1,22 @@
+{
+  "name": "pms-diff",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "ssdh233 <songsongdahu233@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.10",
+    "node-fetch": "^2.6.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-table": "^7.7.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/preset-env": "^7.15.0",
+    "@babel/preset-react": "^7.14.5",
+    "babel-loader": "^8.2.2",
+    "webpack": "^5.49.0",
+    "webpack-cli": "^4.7.2"
+  }
+}
