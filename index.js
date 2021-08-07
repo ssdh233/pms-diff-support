@@ -1,9 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import { useTable } from "react-table";
+import { useTable, useSortBy } from "react-table";
 
-function App({ data: propData }) {
-  const data = React.useMemo(() => propData, [propData]);
+function App({ data }) {
+  const levels = new Set(data.map((x) => x.level));
+  const [selectedLevel, setSelectedLevel] = useState("P●1");
+
+  const tableData = React.useMemo(
+    () => data.filter((x) => x.level === selectedLevel),
+    [data, selectedLevel]
+  );
+
+  console.log(tableData);
   const columns = React.useMemo(
     () => [
       {
@@ -13,6 +21,9 @@ function App({ data: propData }) {
       {
         Header: "title",
         accessor: "title",
+        Cell: ({ row }) => (
+          <a href={row.original.lr2link}>{row.values.title}</a>
+        ),
       },
       {
         Header: "artist",
@@ -23,125 +34,100 @@ function App({ data: propData }) {
         accessor: "mapper",
       },
       {
+        Header: "FC",
+        accessor: "clear_fc",
+        sortType: "number",
+        Cell: ({ row }) => <div>{Math.floor(row.values.clear_fc, 2)}%</div>,
+      },
+      {
+        Header: "H",
+        accessor: "clear_hard",
+        sortType: "number",
+        Cell: ({ row }) => <div>{Math.floor(row.values.clear_hard, 2)}%</div>,
+      },
+      {
+        Header: "N",
+        accessor: "clear_normal",
+        sortType: "number",
+        Cell: ({ row }) => <div>{Math.floor(row.values.clear_normal, 2)}%</div>,
+      },
+      {
+        Header: "E",
+        accessor: "clear_easy",
+        sortType: "number",
+        Cell: ({ row }) => <div>{Math.floor(row.values.clear_easy, 2)}%</div>,
+      },
+      {
+        Header: "count",
+        accessor: "playerCount",
+      },
+      {
         Header: "bpm",
         accessor: "bpm",
-      },
-      {
-        Header: "fc",
-        accessor: "clear_fc",
         Cell: ({ row }) => {
-          const { clear_fc, playerCount } = row.values;
-          return (
-            <div>
-              {Math.floor((Number(clear_fc) / Number(playerCount)) * 100, 2)}%
-            </div>
-          );
+          const [min, max] = row.values.bpm.split("-").map(Number);
+          if (max === min) {
+            return max;
+          } else {
+            return row.values.bpm;
+          }
         },
-      },
-      {
-        Header: "hard",
-        accessor: "clear_hard",
-        Cell: ({ row }) => {
-          const { clear_fc, clear_hard, playerCount } = row.values;
-          return (
-            <div>
-              {Math.floor(
-                ((Number(clear_fc) + Number(clear_hard)) /
-                  Number(playerCount)) *
-                  100,
-                2
-              )}
-              %
-            </div>
-          );
-        },
-      },
-      {
-        Header: "normal",
-        accessor: "clear_normal",
-        Cell: ({ row }) => {
-          const { clear_fc, clear_hard, clear_normal, playerCount } =
-            row.values;
-          return (
-            <div>
-              {Math.floor(
-                ((Number(clear_fc) +
-                  Number(clear_hard) +
-                  Number(clear_normal)) /
-                  Number(playerCount)) *
-                  100,
-                2
-              )}
-              %
-            </div>
-          );
-        },
-      },
-      {
-        Header: "easy",
-        accessor: "clear_easy",
-        Cell: ({ row }) => {
-          const {
-            clear_fc,
-            clear_hard,
-            clear_normal,
-            clear_easy,
-            playerCount,
-          } = row.values;
-
-          return (
-            <div>
-              {Math.floor(
-                ((Number(clear_fc) +
-                  Number(clear_hard) +
-                  Number(clear_normal) +
-                  Number(clear_easy)) /
-                  Number(playerCount)) *
-                  100,
-                2
-              )}
-              %
-            </div>
-          );
-        },
-      },
-      {
-        Header: "player_count",
-        accessor: "playerCount",
       },
     ],
     []
   );
-  const tableInstance = useTable({ columns, data });
+  const tableInstance = useTable({ columns, data: tableData }, useSortBy);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     tableInstance;
 
   return (
-    // apply the table props
-    <table {...getTableProps()}>
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps()}>{column.render("Header")}</th>
-            ))}
-          </tr>
+    <>
+      <div>
+        {[...levels].map((x) => (
+          <button
+            onClick={() => setSelectedLevel(x)}
+            style={x === selectedLevel ? { color: "red" } : {}}
+          >
+            {x}
+          </button>
         ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
-              })}
+      </div>
+      <table {...getTableProps()} className="mainTable">
+        <thead>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                  {column.render("Header")}
+                  <span>
+                    {column.isSorted
+                      ? column.isSortedDesc
+                        ? " 🔽"
+                        : " 🔼"
+                      : ""}
+                  </span>
+                </th>
+              ))}
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row) => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map((cell) => {
+                  return (
+                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </>
   );
 }
 

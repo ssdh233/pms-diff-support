@@ -1,6 +1,62 @@
 <!DOCTYPE html>
 <head>
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
   <script src="bundle.js"></script>
+  <style>
+    .mainTable {
+      background-color: #f8f9fa;
+      border: 1px solid #a2a9b1;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .mainTable td {
+        line-height: 1.2rem;
+        max-height: 2.4rem;
+        overflow: hidden;
+      }
+      .mainTable th:nth-child(1),
+      .mainTable td:nth-child(1) {
+        display: none;
+      }
+      .mainTable th:nth-child(3),
+      .mainTable td:nth-child(3) {
+        display: none;
+      }
+      .mainTable th:nth-child(4),
+      .mainTable td:nth-child(4) {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 60px;
+      }
+      .mainTable td:nth-child(5),
+      .mainTable td:nth-child(6),
+      .mainTable td:nth-child(7),
+      .mainTable td:nth-child(8),
+      .mainTable td:nth-child(10) {
+        word-break: normal;
+      }
+    }
+
+    .mainTable th {
+      background-color: #eaecf0;
+      border: 1px solid #a2a9b1;
+      padding: 0.2em 0.4em;
+      max-width: 200px;
+    }
+
+    .mainTable td {
+      border: 1px solid #a2a9b1;
+      padding: 0.2em 0.4em;
+      max-width: 200px;
+      word-break: break-all;
+    }
+
+    .mainTable td:nth-child(2) {
+      min-width: 120px;
+    }
+  </style>
 </head>
 <body>
   <div id="react"></div>
