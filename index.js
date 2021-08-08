@@ -73,6 +73,10 @@ function App({ data }) {
           }
         },
       },
+      {
+        Header: "memo",
+        accessor: "memo",
+      }
     ],
     []
   );
