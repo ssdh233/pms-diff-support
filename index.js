@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { useTable, useSortBy } from "react-table";
-import UnicodeSearch from "./UnicodeSearch";
 
 function App({ data }) {
-  const levels = new Set(data.result.map((x) => x.level));
+  const levels = new Set(data.map((x) => x.level));
   const [selectedLevel, setSelectedLevel] = useState("P●1");
 
   const tableData = React.useMemo(
-    () => data.result.filter((x) => x.level === selectedLevel),
+    () => data.filter((x) => x.level === selectedLevel),
     [data, selectedLevel]
   );
 
