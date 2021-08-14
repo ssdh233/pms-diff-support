@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { useTable, useSortBy } from "react-table";
+import UnicodeSearch from "./UnicodeSearch";
 
 function App({ data }) {
-  const levels = new Set(data.map((x) => x.level));
+  const levels = new Set(data.result.map((x) => x.level));
   const [selectedLevel, setSelectedLevel] = useState("P●1");
 
   const tableData = React.useMemo(
-    () => data.filter((x) => x.level === selectedLevel),
+    () => data.result.filter((x) => x.level === selectedLevel),
     [data, selectedLevel]
   );
 
@@ -76,7 +77,7 @@ function App({ data }) {
       {
         Header: "memo",
         accessor: "memo",
-      }
+      },
     ],
     []
   );
@@ -131,11 +132,15 @@ function App({ data }) {
           })}
         </tbody>
       </table>
+      <div>updated: {new Date(data.time).toLocaleString()}</div>
     </>
   );
 }
 
-fetch("./result.json")
+// fetch("https://ssdh233.s3.ap-northeast-1.amazonaws.com/result.json", {
+fetch("result.json", {
+  mode: "cors",
+})
   .then((res) => res.json())
   .then((data) => {
     console.log(data);

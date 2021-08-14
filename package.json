@@ -5,8 +5,11 @@
   "author": "ssdh233 <songsongdahu233@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "aws-sdk": "^2.968.0",
     "cheerio": "^1.0.0-rc.10",
+    "dotenv": "^10.0.0",
     "node-fetch": "^2.6.1",
+    "puppeteer": "^10.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-table": "^7.7.0"
