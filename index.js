@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { useTable, useSortBy } from "react-table";
 
-function App({ data }) {
-  const levels = new Set(data.map((x) => x.level));
+function App({ data: { result, date } }) {
+  const levels = new Set(result.map((x) => x.level));
   const [selectedLevel, setSelectedLevel] = useState("P●1");
 
   const tableData = React.useMemo(
-    () => data.filter((x) => x.level === selectedLevel),
-    [data, selectedLevel]
+    () => result.filter((x) => x.level === selectedLevel),
+    [result, selectedLevel]
   );
 
   console.log(tableData);
@@ -131,13 +131,12 @@ function App({ data }) {
           })}
         </tbody>
       </table>
-      <div>updated: {new Date(data.time).toLocaleString()}</div>
+      <div>updated: {new Date(date).toLocaleString()}</div>
     </>
   );
 }
 
-// fetch("https://ssdh233.s3.ap-northeast-1.amazonaws.com/result.json", {
-fetch("result.json", {
+fetch("https://ssdh233.s3.ap-northeast-1.amazonaws.com/result.json", {
   mode: "cors",
 })
   .then((res) => res.json())

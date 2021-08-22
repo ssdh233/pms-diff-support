@@ -5,7 +5,7 @@ const fetch = require("node-fetch");
 
 require("dotenv").config({});
 
-const LIMIT = 3;
+const LIMIT = 70;
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.ACCESS_KEY_ID,
@@ -52,10 +52,11 @@ async function updateStatus(params) {
 async function getPMSDatabaseHTML() {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
+  page.setDefaultNavigationTimeout(0);
   await page.goto(
     "https://pmsdifficulty.xxxxxxxx.jp/insane_PMSdifficulty.html",
     {
-      waitUntil: "networkidle2",
+      waitUntil: "networkidle0",
     }
   );
   const bodyHTML = await page.evaluate(() => document.body.innerHTML);
@@ -64,6 +65,7 @@ async function getPMSDatabaseHTML() {
 }
 
 async function crawl(n, PMSDatabaseHTML) {
+  console.log(PMSDatabaseHTML && PMSDatabaseHTML.length);
   const $ = cheerio.load(PMSDatabaseHTML);
 
   const rows = Array.from($("#table_int > tbody > tr"));
@@ -140,11 +142,18 @@ async function crawl(n, PMSDatabaseHTML) {
   let status = await getInitialStatus();
   let PMSDatabaseHTML;
 
+  status = { step: "MERGE_RESULT" };
+
   while (status.step !== "DONE") {
     console.log(status);
     switch (status.step) {
       case "FETCH_HTML": {
         PMSDatabaseHTML = await getPMSDatabaseHTML();
+        console.log(
+          "PMSDatabaseHTML.length",
+          PMSDatabaseHTML && PMSDatabaseHTML.length
+        );
+
         await s3
           .upload({
             Bucket: "ssdh232",
@@ -156,6 +165,23 @@ async function crawl(n, PMSDatabaseHTML) {
         break;
       }
       case "CRAWLING": {
+        if (!PMSDatabaseHTML) {
+          console.log("Trying to fetch PMSDatabaseHTML");
+          PMSDatabaseHTML = (
+            await s3
+              .getObject({
+                Bucket: "ssdh232",
+                Key: "insane_PMSdifficulty.html",
+              })
+              .promise()
+          ).Body;
+        }
+
+        console.log(
+          "PMSDatabaseHTML.length",
+          PMSDatabaseHTML && PMSDatabaseHTML.length
+        );
+
         const n = status.index;
         if (n >= LIMIT) {
           status = await updateStatus({ step: "MERGE_RESULT" });
@@ -178,7 +204,8 @@ async function crawl(n, PMSDatabaseHTML) {
           .upload({
             Bucket: "ssdh233",
             Key: "result.json",
-            Body: JSON.stringify(result),
+            Body: JSON.stringify({ result, date: new Date().getTime() }),
+            ACL: "public-read",
           })
           .promise();
         status = await updateStatus({ step: "DONE" });
