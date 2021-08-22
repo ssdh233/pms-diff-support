@@ -5,7 +5,7 @@ const fetch = require("node-fetch");
 
 require("dotenv").config({});
 
-const LIMIT = 3;
+const LIMIT = 70;
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.ACCESS_KEY_ID,
