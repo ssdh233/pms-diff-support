@@ -142,6 +142,8 @@ async function crawl(n, PMSDatabaseHTML) {
   let status = await getInitialStatus();
   let PMSDatabaseHTML;
 
+  status = { step: "MERGE_RESULT" };
+
   while (status.step !== "DONE") {
     console.log(status);
     switch (status.step) {
@@ -202,7 +204,8 @@ async function crawl(n, PMSDatabaseHTML) {
           .upload({
             Bucket: "ssdh233",
             Key: "result.json",
-            Body: JSON.stringify(result),
+            Body: JSON.stringify({ result, date: new Date().getTime() }),
+            ACL: "public-read",
           })
           .promise();
         status = await updateStatus({ step: "DONE" });
