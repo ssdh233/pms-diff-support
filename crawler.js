@@ -146,6 +146,11 @@ async function crawl(n, PMSDatabaseHTML) {
     switch (status.step) {
       case "FETCH_HTML": {
         PMSDatabaseHTML = await getPMSDatabaseHTML();
+        console.log(
+          "PMSDatabaseHTML.length",
+          PMSDatabaseHTML && PMSDatabaseHTML.length
+        );
+
         await s3
           .upload({
             Bucket: "ssdh232",
@@ -158,13 +163,21 @@ async function crawl(n, PMSDatabaseHTML) {
       }
       case "CRAWLING": {
         if (!PMSDatabaseHTML) {
-          console.log("Trying to fetch PMSDatabaseHTML")
-          PMSDatabaseHTML = (await s3
-            .getObject({ Bucket: "ssdh232", Key: "insane_PMSdifficulty.html" })
-            .promise()).Body;
+          console.log("Trying to fetch PMSDatabaseHTML");
+          PMSDatabaseHTML = (
+            await s3
+              .getObject({
+                Bucket: "ssdh232",
+                Key: "insane_PMSdifficulty.html",
+              })
+              .promise()
+          ).Body;
         }
 
-        console.log(PMSDatabaseHTML && PMSDatabaseHTML.length);
+        console.log(
+          "PMSDatabaseHTML.length",
+          PMSDatabaseHTML && PMSDatabaseHTML.length
+        );
 
         const n = status.index;
         if (n >= LIMIT) {
