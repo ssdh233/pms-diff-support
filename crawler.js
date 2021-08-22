@@ -52,6 +52,7 @@ async function updateStatus(params) {
 async function getPMSDatabaseHTML() {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
+  page.setDefaultNavigationTimeout(0);
   await page.goto(
     "https://pmsdifficulty.xxxxxxxx.jp/insane_PMSdifficulty.html",
     {
