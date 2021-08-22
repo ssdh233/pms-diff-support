@@ -55,7 +55,7 @@ async function getPMSDatabaseHTML() {
   await page.goto(
     "https://pmsdifficulty.xxxxxxxx.jp/insane_PMSdifficulty.html",
     {
-      waitUntil: "networkidle2",
+      waitUntil: "networkidle0",
     }
   );
   const bodyHTML = await page.evaluate(() => document.body.innerHTML);
