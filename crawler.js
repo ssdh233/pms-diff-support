@@ -64,6 +64,7 @@ async function getPMSDatabaseHTML() {
 }
 
 async function crawl(n, PMSDatabaseHTML) {
+  console.log(PMSDatabaseHTML && PMSDatabaseHTML.length);
   const $ = cheerio.load(PMSDatabaseHTML);
 
   const rows = Array.from($("#table_int > tbody > tr"));
@@ -156,6 +157,15 @@ async function crawl(n, PMSDatabaseHTML) {
         break;
       }
       case "CRAWLING": {
+        if (!PMSDatabaseHTML) {
+          console.log("Trying to fetch PMSDatabaseHTML")
+          PMSDatabaseHTML = (await s3
+            .getObject({ Bucket: "ssdh232", Key: "insane_PMSdifficulty.html" })
+            .promise()).Body;
+        }
+
+        console.log(PMSDatabaseHTML && PMSDatabaseHTML.length);
+
         const n = status.index;
         if (n >= LIMIT) {
           status = await updateStatus({ step: "MERGE_RESULT" });
