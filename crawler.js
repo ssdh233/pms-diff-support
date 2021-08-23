@@ -142,8 +142,6 @@ async function crawl(n, PMSDatabaseHTML) {
   let status = await getInitialStatus();
   let PMSDatabaseHTML;
 
-  status = { step: "MERGE_RESULT" };
-
   while (status.step !== "DONE") {
     console.log(status);
     switch (status.step) {
