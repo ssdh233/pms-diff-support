@@ -72,6 +72,7 @@ async function crawl(n, PMSDatabaseHTML) {
   const result = [];
 
   for (let i = n * 100; i < Math.min(rows.length, (n + 1) * 100); i++) {
+    await new Promise((r) => setTimeout(r, 5000));
     console.log("processing", i);
     const row = $(rows[i]);
     if (row.attr("class") && row.attr("class") !== "tr_separate") {
