@@ -6,9 +6,10 @@ const LocalFileManager = require("./LocalFileManager");
 
 require("dotenv").config({});
 
-let INITER = "test";
+let INITER = "local-real";
 let RUN_ID;
-const LIMIT = 3;
+const LIMIT = 70;
+const FETCH_INTERVAL = 3000;
 // const fm232 = new AWSFileManager({
 //   Bucket: "ssdh232",
 //   credentials: {
@@ -75,6 +76,20 @@ async function getPMSDatabaseHTML() {
   return bodyHTML;
 }
 
+function getPlayerList($lr2) {
+  return Array.from(
+    $lr2("#box > table:nth-of-type(4) > tbody > tr:nth-child(even)")
+  ).map((x) => {
+    return [
+      $lr2($lr2($lr2(x).children()[1]).children()[0])
+        .attr("href")
+        .split("playerid=")[1],
+      $lr2($lr2(x).children()[1]).text(),
+      $lr2($lr2(x).children()[3]).text(),
+    ];
+  });
+}
+
 async function crawl(n, PMSDatabaseHTML) {
   console.log(PMSDatabaseHTML && PMSDatabaseHTML.length);
   const $ = cheerio.load(PMSDatabaseHTML);
@@ -83,14 +98,26 @@ async function crawl(n, PMSDatabaseHTML) {
   const result = [];
 
   for (let i = n * 100; i < Math.min(rows.length, (n + 1) * 100); i++) {
-    await new Promise((r) => setTimeout(r, 2500));
+    await new Promise((r) => setTimeout(r, FETCH_INTERVAL));
     console.log("processing", i);
     const row = $(rows[i]);
     if (row.attr("class") && row.attr("class") !== "tr_separate") {
-      let lr2link = $($(row.children()[3]).children()[0]).attr("href");
+      let lr2link = $($(row.children()[4]).children()[0]).attr("href");
 
-      const lr2HTML = await fetch(lr2link).then((res) => res.text());
+      const lr2HTML = await fetch(lr2link)
+        .then((res) => res.arrayBuffer())
+        .then((buffer) => {
+          const decoder = new TextDecoder("shift_jis");
+          const text = decoder.decode(buffer);
+          return text;
+        });
       const $lr2 = cheerio.load(lr2HTML);
+
+      const playerCount = Number(
+        $lr2(
+          "#box > table:nth-of-type(2) > tbody > tr:nth-child(3) > td:nth-child(2)"
+        ).text()
+      );
 
       const song = {
         level: $(row.children()[0]).text(),
@@ -103,11 +130,7 @@ async function crawl(n, PMSDatabaseHTML) {
         bpm: $lr2(
           "#box > table:nth-of-type(1) > tbody > tr:nth-child(1) > td:nth-child(2)"
         ).text(),
-        playerCount: Number(
-          $lr2(
-            "#box > table:nth-of-type(2) > tbody > tr:nth-child(3) > td:nth-child(2)"
-          ).text()
-        ),
+        playerCount,
         clear_fc: Number(
           $lr2(
             "#box > table:nth-of-type(3) > tbody > tr:nth-child(4) > td:nth-child(2)"
@@ -136,7 +159,25 @@ async function crawl(n, PMSDatabaseHTML) {
             .text()
             .replace("%", "")
         ),
+        players: getPlayerList($lr2),
       };
+
+      if (playerCount > 100) {
+        const playerPages = Math.ceil(playerCount / 100);
+        for (let j = 2; j <= playerPages; j++) {
+          await new Promise((r) => setTimeout(r, FETCH_INTERVAL));
+          const lr2HTML = await fetch(lr2link + "&page=" + j)
+            .then((res) => res.arrayBuffer())
+            .then((buffer) => {
+              const decoder = new TextDecoder("shift_jis");
+              const text = decoder.decode(buffer);
+              return text;
+            });
+          const $lr2 = cheerio.load(lr2HTML);
+          song.players = [...song.players, ...getPlayerList($lr2)];
+        }
+      }
+
       result.push(song);
     }
   }
