@@ -76,7 +76,7 @@ async function crawl(n, PMSDatabaseHTML) {
     console.log("processing", i);
     const row = $(rows[i]);
     if (row.attr("class") && row.attr("class") !== "tr_separate") {
-      let lr2link = $($(row.children()[3]).children()[0]).attr("href");
+      let lr2link = $($(row.children()[4]).children()[0]).attr("href");
 
       const lr2HTML = await fetch(lr2link).then((res) => res.text());
       const $lr2 = cheerio.load(lr2HTML);
