@@ -83,12 +83,12 @@ async function crawl(n, PMSDatabaseHTML) {
 
       const song = {
         level: $(row.children()[0]).text(),
-        title: $(row.children()[3]).text(),
+        title: $(row.children()[4]).text(),
         lr2link,
-        artist: $(row.children()[4]).text(),
-        mapper: $(row.children()[5]).text(),
-        memo: $(row.children()[6]).text(),
-        comment: $(row.children()[7]).text(),
+        artist: $(row.children()[5]).text(),
+        mapper: $(row.children()[6]).text(),
+        memo: $(row.children()[9]).text(),
+        comment: $(row.children()[10]).text(),
         bpm: $lr2(
           "#box > table:nth-of-type(1) > tbody > tr:nth-child(1) > td:nth-child(2)"
         ).text(),
