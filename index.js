@@ -7,11 +7,22 @@ function App({ data: { result, date } }) {
   const [selectedLevel, setSelectedLevel] = useState("P●1");
 
   const tableData = React.useMemo(
-    () => result.filter((x) => x.level === selectedLevel),
+    () =>
+      result
+        .filter((x) => x.level === selectedLevel)
+        .sort((a, b) => a.title.localeCompare(b.title, "ja")),
     [result, selectedLevel]
   );
 
   console.log(tableData);
+  const titleSortFn = React.useCallback((rowA, rowB, id, desc) => {
+    console.log(
+      rowA.values.title,
+      rowB.values.title,
+      rowA.values.title.localeCompare(rowB.values.title, "ja")
+    );
+    return rowA.values.title.localeCompare(rowB.values.title, "ja");
+  }, []);
   const columns = React.useMemo(
     () => [
       {
@@ -24,6 +35,7 @@ function App({ data: { result, date } }) {
         Cell: ({ row }) => (
           <a href={row.original.lr2link}>{row.values.title}</a>
         ),
+        sortType: titleSortFn,
       },
       {
         Header: "artist",
