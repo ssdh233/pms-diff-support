@@ -148,7 +148,7 @@ function App({ data: { result, date } }) {
   );
 }
 
-fetch("https://ssdh233.s3.ap-northeast-1.amazonaws.com/result.json", {
+fetch("https://ssdh233.s3.ap-northeast-1.amazonaws.com/result.json?versionId=tMof.b2NkpNvLzoRAdBDZikMPk.r1359", {
   mode: "cors",
 })
   .then((res) => res.json())

@@ -4,6 +4,9 @@
   "main": "index.js",
   "author": "ssdh233 <songsongdahu233@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "build": "webpack --mode=\"production\""
+  },
   "dependencies": {
     "aws-sdk": "^2.968.0",
     "cheerio": "^1.0.0-rc.10",
