@@ -5,7 +5,8 @@
   "author": "ssdh233 <songsongdahu233@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "webpack --mode=\"production\""
+    "build": "webpack --mode=\"production\"",
+    "build:watch": "webpack --watch"
   },
   "dependencies": {
     "aws-sdk": "^2.968.0",
